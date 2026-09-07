@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>タスク管理アプリ</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>タスク管理ボード</h1>
+
+  <div id="board">
+
+    <!-- 列1: 未着手 -->
+    <div class="list" data-list-id="todo">
+      <h2>未着手</h2>
+      <div class="card-list"></div>
+      <div class="add-card">
+        <input type="text" class="new-card-input" placeholder="新しいタスクを入力">
+        <button class="add-card-btn">＋ 追加</button>
+      </div>
+    </div>
+
+    <!-- 列2: 作業中 -->
+    <div class="list" data-list-id="doing">
+      <h2>作業中</h2>
+      <div class="card-list"></div>
+      <div class="add-card">
+        <input type="text" class="new-card-input" placeholder="新しいタスクを入力">
+        <button class="add-card-btn">＋ 追加</button>
+      </div>
+    </div>
+
+    <!-- 列3: 完了 -->
+    <div class="list" data-list-id="done">
+      <h2>完了</h2>
+      <div class="card-list"></div>
+      <div class="add-card">
+        <input type="text" class="new-card-input" placeholder="新しいタスクを入力">
+        <button class="add-card-btn">＋ 追加</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
