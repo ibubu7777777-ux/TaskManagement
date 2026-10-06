@@ -1,7 +1,7 @@
 // ====== 1. データ本体 ======
 // このアプリの「本当の中身」。画面はすべてこのデータから作られる。
 // 各列(list)は id / title / cards(カードの配列) を持つ。
-// 各カード(card)は id / text / priority（優先度） / dueDate（期限）を持つ。
+// 各カード(card)は id / text / description（説明文） / priority（優先度） / dueDate（期限）を持つ。
 
 // 優先度は "high"（高） / "mid"（中） / "low"（低）の3段階。
 // ソートのときに使う「優先度の強さ」の数値表現。大きいほど優先度が高い。
@@ -17,14 +17,14 @@ const defaultBoard = [
     id: "todo",
     title: "未着手",
     cards: [
-      { id: "c1", text: "牛乳を買う", priority: "mid", dueDate: "" },
-      { id: "c2", text: "宿題をやる", priority: "high", dueDate: "" },
+      { id: "c1", text: "牛乳を買う", description: "", priority: "mid", dueDate: "" },
+      { id: "c2", text: "宿題をやる", description: "", priority: "high", dueDate: "" },
     ],
   },
   {
     id: "doing",
     title: "作業中",
-    cards: [{ id: "c3", text: "課題アプリを作る", priority: "high", dueDate: "" }],
+    cards: [{ id: "c3", text: "課題アプリを作る", description: "", priority: "high", dueDate: "" }],
   },
   {
     id: "done",
@@ -41,6 +41,7 @@ function loadBoard() {
   // 優先度・期限を追加する前に保存されたカードにも、デフォルト値を補っておく
   loadedBoard.forEach((list) => {
     list.cards.forEach((card) => {
+      if (card.description === undefined) card.description = "";
       if (card.priority === undefined) card.priority = "mid";
       if (card.dueDate === undefined) card.dueDate = "";
 
@@ -142,6 +143,17 @@ function render() {
         startEditingCard(card, textEl);
       });
 
+      // 説明文の入力欄（常時表示。入力するとすぐに反映される）
+      const descEl = document.createElement("textarea");
+      descEl.className = "card-desc";
+      descEl.rows = 1;
+      descEl.placeholder = "説明を追加";
+      descEl.value = card.description;
+      descEl.addEventListener("change", () => {
+        card.description = descEl.value.trim();
+        render(); // データが変わったので描き直す
+      });
+
       // 優先度・期限をまとめて表示する行
       const metaEl = document.createElement("div");
       metaEl.className = "card-meta";
@@ -191,6 +203,7 @@ function render() {
       headerEl.appendChild(deleteBtn);
 
       cardEl.appendChild(headerEl);
+      cardEl.appendChild(descEl);
       cardEl.appendChild(metaEl);
       cardListEl.appendChild(cardEl);
     });
@@ -366,41 +379,80 @@ function startEditingCard(card, textEl) {
   input.addEventListener("blur", finishEditing);
 }
 
-// ====== 6. カード追加機能 ======
-// 「＋ 追加」ボタンがクリックされたときの処理をまとめた関数
+// ====== 6. カード追加機能（モーダル） ======
+// モーダルの各要素をまとめて取得しておく
+const modalOverlay = document.getElementById("modal-overlay");
+const taskForm = document.getElementById("task-form");
+const taskTitleInput = document.getElementById("task-title");
+const taskDescInput = document.getElementById("task-desc");
+const taskDueInput = document.getElementById("task-due");
+const titleErrorEl = document.getElementById("title-error");
+
+let modalListId = null; // 「＋ タスク追加」をどの列のボタンから開いたかを覚えておく
+
+// モーダルを開く（listIdの列に追加するつもりで開く）
+function openModal(listId) {
+  modalListId = listId;
+  taskForm.reset(); // 前回入力した内容が残らないようにリセットする
+  titleErrorEl.hidden = true;
+  modalOverlay.hidden = false;
+  taskTitleInput.focus();
+}
+
+// モーダルを閉じる
+function closeModal() {
+  modalOverlay.hidden = true;
+}
+
+// 「＋ タスク追加」ボタン・モーダルのイベントをまとめて設定する
 function setupAddCardButtons() {
-  // ページ上の .list を全部取得して、1つずつイベントを仕込む
+  // 各列の「＋ タスク追加」ボタンを押したら、その列を覚えてモーダルを開く
   document.querySelectorAll(".list").forEach((listEl) => {
-    const listId = listEl.dataset.listId; // "todo" などの列ID
-    const input = listEl.querySelector(".new-card-input");
-    const button = listEl.querySelector(".add-card-btn");
+    listEl.querySelector(".add-card-btn").addEventListener("click", () => {
+      openModal(listEl.dataset.listId);
+    });
+  });
 
-    // 入力欄の内容をもとに、カードを追加する処理（ボタンからもEnterキーからも呼ぶ）
-    function addCard() {
-      const text = input.value.trim(); // 前後の余計な空白を除去
+  // フォームの「保存」ボタン（＝submit）が押されたときの処理
+  taskForm.addEventListener("submit", (event) => {
+    event.preventDefault(); // ページがリロードされるデフォルトの動作を止める
 
-      // 何も入力されていなければ何もしない
-      if (text === "") return;
-
-      // board配列の中から、対応する列を探す
-      const list = board.find((l) => l.id === listId);
-
-      // 新しいカードを追加する（優先度は「中」、期限は未設定で開始）
-      list.cards.push({ id: `c${nextCardId}`, text: text, priority: "mid", dueDate: "" });
-      nextCardId++;
-
-      input.value = ""; // 入力欄を空にする
-      render();          // データが変わったので画面を描き直す
+    const title = taskTitleInput.value.trim();
+    if (title === "") {
+      titleErrorEl.hidden = false; // タイトル未入力ならエラー文を表示して中断
+      return;
     }
 
-    button.addEventListener("click", addCard);
+    // board配列の中から、モーダルを開いたときの列を探す
+    const list = board.find((l) => l.id === modalListId);
 
-    // 入力欄にカーソルがある状態でEnterキーを押したときも追加する
-    input.addEventListener("keydown", (event) => {
-      if (event.key === "Enter") {
-        addCard();
-      }
+    // ラジオボタンで選ばれている優先度を取得する（taskForm.priority で name="priority" の値を取れる）
+    const priority = taskForm.priority.value;
+
+    list.cards.push({
+      id: `c${nextCardId}`,
+      text: title,
+      description: taskDescInput.value.trim(),
+      priority: priority,
+      dueDate: taskDueInput.value, // 未入力なら空文字になる
     });
+    nextCardId++;
+
+    closeModal();
+    render(); // データが変わったので画面を描き直す
+  });
+
+  // 「キャンセル」ボタンで閉じる
+  document.getElementById("cancel-btn").addEventListener("click", closeModal);
+
+  // 背景（半透明の部分）をクリックしても閉じる
+  modalOverlay.addEventListener("click", (event) => {
+    if (event.target === modalOverlay) closeModal();
+  });
+
+  // Escキーでも閉じる
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !modalOverlay.hidden) closeModal();
   });
 }
 

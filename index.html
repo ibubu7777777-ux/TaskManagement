@@ -18,10 +18,7 @@
         <button class="sort-btn" data-sort-key="dueDate">期限順 ▲</button>
       </div>
       <div class="card-list"></div>
-      <div class="add-card">
-        <input type="text" class="new-card-input" placeholder="新しいタスクを入力">
-        <button class="add-card-btn">＋ 追加</button>
-      </div>
+      <button class="add-card-btn">＋ タスク追加</button>
     </div>
 
     <!-- 列2: 作業中 -->
@@ -32,10 +29,7 @@
         <button class="sort-btn" data-sort-key="dueDate">期限順 ▲</button>
       </div>
       <div class="card-list"></div>
-      <div class="add-card">
-        <input type="text" class="new-card-input" placeholder="新しいタスクを入力">
-        <button class="add-card-btn">＋ 追加</button>
-      </div>
+      <button class="add-card-btn">＋ タスク追加</button>
     </div>
 
     <!-- 列3: 完了 -->
@@ -46,12 +40,41 @@
         <button class="sort-btn" data-sort-key="dueDate">期限順 ▲</button>
       </div>
       <div class="card-list"></div>
-      <div class="add-card">
-        <input type="text" class="new-card-input" placeholder="新しいタスクを入力">
-        <button class="add-card-btn">＋ 追加</button>
-      </div>
+      <button class="add-card-btn">＋ タスク追加</button>
     </div>
 
+  </div>
+
+  <!-- タスク作成モーダル（3列共通で1つだけ用意し、どの列から開いたかはJS側で覚えておく） -->
+  <div id="modal-overlay" class="modal-overlay" hidden>
+    <form id="task-form" class="modal" novalidate>
+      <h2>タスクの作成</h2>
+
+      <label>タイトル <span class="required">*</span>
+        <input type="text" id="task-title" placeholder="タスクのタイトルを入力">
+      </label>
+      <p id="title-error" class="error" hidden>タイトルを入力してください</p>
+
+      <label>説明文
+        <textarea id="task-desc" rows="3" placeholder="タスクの説明を入力（任意）"></textarea>
+      </label>
+
+      <fieldset>
+        <legend>優先度</legend>
+        <label><input type="radio" name="priority" value="high"> 高</label>
+        <label><input type="radio" name="priority" value="mid" checked> 中</label>
+        <label><input type="radio" name="priority" value="low"> 低</label>
+      </fieldset>
+
+      <label>期限
+        <input type="date" id="task-due">
+      </label>
+
+      <div class="modal-actions">
+        <button type="button" id="cancel-btn" class="btn-cancel">キャンセル</button>
+        <button type="submit" class="btn-save">保存</button>
+      </div>
+    </form>
   </div>
 
   <script src="script.js"></script>

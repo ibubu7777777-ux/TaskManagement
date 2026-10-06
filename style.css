@@ -85,6 +85,24 @@ h1 {
   cursor: pointer;
 }
 
+/* 説明文（常時表示の入力欄。空なら「説明を追加」などのプレースホルダーを出す） */
+.card-desc {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 4px 6px;
+  border: 1px solid transparent; /* 普段は枠線を見せない */
+  border-radius: 4px;
+  font-size: 12px;
+  font-family: inherit;
+  color: #555;
+  resize: none;
+}
+
+.card-desc:hover,
+.card-desc:focus {
+  border-color: #ccc; /* ホバー・編集中だけ枠線を見せる */
+}
+
 /* 2段目：優先度セレクトと期限入力の行 */
 .card-meta {
   display: flex;
@@ -148,29 +166,122 @@ h1 {
   color: #c00;
 }
 
-/* カード追加フォーム部分 */
-.add-card {
-  margin-top: 10px;
-  display: flex;
-  gap: 4px;
-}
-
-.new-card-input {
-  flex: 1; /* 残りの幅いっぱいに広がる */
-  padding: 6px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
+/* 「＋ タスク追加」ボタン（押すとモーダルが開く） */
 .add-card-btn {
-  padding: 6px 10px;
-  border: none;
-  border-radius: 4px;
-  background-color: #5aac44;
-  color: white;
+  width: 100%;
+  margin-top: 10px;
+  padding: 8px;
+  box-sizing: border-box;
+  border: 2px dashed #aaa;
+  border-radius: 6px;
+  background: none;
+  color: #555;
   cursor: pointer;
 }
 
 .add-card-btn:hover {
-  background-color: #4d9c3d;
+  background-color: #dfe1e6;
+}
+
+/* ====== タスク作成モーダル ====== */
+
+/* 画面全体を覆う半透明の背景 */
+.modal-overlay {
+  position: fixed;
+  inset: 0; /* 上下左右すべて0 ＝ 画面いっぱいに広げる */
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* hidden属性が付いているときは非表示にする */
+.modal-overlay[hidden] {
+  display: none;
+}
+
+/* モーダル本体（白い箱） */
+.modal {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  width: 360px;
+  max-width: 90vw;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.modal h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.modal label,
+.modal legend {
+  display: block;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.modal input[type="text"],
+.modal input[type="date"],
+.modal textarea {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 6px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+  font-weight: normal;
+}
+
+.modal fieldset {
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+.modal fieldset label {
+  display: inline-block;
+  margin-right: 12px;
+  margin-top: 6px;
+  font-weight: normal;
+}
+
+.required,
+.error {
+  color: #d9443b;
+}
+
+.error {
+  margin: -8px 0 0;
+  font-size: 12px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.modal-actions button {
+  padding: 8px 18px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.btn-cancel {
+  background: #e2e2e2;
+}
+
+.btn-save {
+  background: #0079bf;
+  color: white;
 }
