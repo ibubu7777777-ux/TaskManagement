@@ -1,0 +1,15 @@
+# エディタ・IDEの個人設定
+.vscode/
+.idea/
+
+# Node.js（frontend/）
+node_modules/
+dist/
+*.log
+
+# ダウンロードした一時ファイル
+backend.zip
+
+# OS関連
+.DS_Store
+Thumbs.db

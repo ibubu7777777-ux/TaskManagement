@@ -66,10 +66,12 @@
       "Bash(set:*)",
       "Bash(tree:*)"
     ],
-    "deny": [
+    "ask": [
       "Bash(rm:*)",
+      "Bash(rmdir:*)"
+    ],
+    "deny": [
       "Bash(rm -rf:*)",
-      "Bash(rmdir:*)",
       "Bash(mv:*)",
       "Bash(git reset --hard:*)",
       "Bash(git push --force:*)",
